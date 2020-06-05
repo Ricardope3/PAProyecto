@@ -16,6 +16,34 @@ func printMatrix(matrix [][]int){
 	fmt.Printf("\n")
 }
 
+func insertExit(floor [][]int, sideExits []int, side, indexExit, lenF int) bool {
+	switch side {
+	case 0:
+		if (floor[0][indexExit] == 3 || floor[1][indexExit] == 1){
+			return false
+		}
+		floor[0][indexExit] = 3
+	case 1:
+		if (floor[indexExit][lenF-1]==3 || floor[indexExit][lenF-2] == 1){
+			return false
+		}
+		floor[indexExit][lenF-1] = 3
+	case 2:
+		if (floor[lenF-1][indexExit]==3 || floor[lenF-2][indexExit] == 1){
+			return false
+		}
+		floor[lenF-1][indexExit] = 3
+	case 3:
+		if (floor[indexExit][0]==3 || floor[indexExit][1] == 1){
+			return false
+		}
+		floor[indexExit][0] = 3
+	default:
+		sideExits[side]++
+	}
+	return true
+}
+
 func generateExits(floor [][]int){
 	sideExits := make([]int, 4)
 	lenF := len(floor)
@@ -27,37 +55,10 @@ func generateExits(floor [][]int){
 		if (sideExits[side]>1){
 			continue
 		}
-		switch side {
-		case 0:
-			if (floor[0][indexExit] == 3 || floor[1][indexExit] == 1){
-				break
-			}
-			floor[0][indexExit] = 3
+		valid := insertExit(floor, sideExits, side, indexExit, lenF)
+		if(valid){
 			i++
-			break
-		case 1:
-			if (floor[indexExit][lenF-1]==3 || floor[indexExit][lenF-2] == 1){
-				break
-			}
-			floor[indexExit][lenF-1] = 3
-			i++
-			break
-		case 2:
-			if (floor[lenF-1][indexExit]==3 || floor[lenF-2][indexExit] == 1){
-				break
-			}
-			floor[lenF-1][indexExit] = 3
-			i++
-			break
-		case 3:
-			if (floor[indexExit][0]==3 || floor[indexExit][1] == 1){
-				break
-			}
-			floor[indexExit][0] = 3
-			i++
-			break
 		}
-		sideExits[side]++
 	}
 }
 
@@ -67,7 +68,6 @@ func main(){
 		a[i] = make([]int, 12)
 	}
 	lenA := len(a)
-	//printMatrix(a)
 	for i := range a {
 		a[0][i] = 1
 		a[i][0] = 1
