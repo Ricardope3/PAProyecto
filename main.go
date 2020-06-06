@@ -72,6 +72,20 @@ func printPast(){
 	}
 }
 
+func printPath(){
+	for i,row := range building {
+		for j,col := range row{
+			if past[i][j][1] == true && past[i][j][0] == true{
+				fmt.Print("Y")
+			}else{
+				fmt.Print(col)
+			}
+			
+		}
+		fmt.Println()
+	}
+}
+
 func getNumOfPeople(){
 	for _,row := range building {
 		for _,col := range row{
@@ -177,26 +191,29 @@ func searchPath(row int, col int) bool{
 	position := coordinate{row,col}
 	e := findClosestExit(position) //index of target exit
 	initializePast()
+	return searchPathRec(row,col,e)
+}
+
+func searchPathRec(row int, col int,e int) bool{
 	past[row][col][0] = true;//mark visited
 	if row == exits[e].row && col == exits[e].col { //reached end
 		return true;
 	}else{
 		if validate(row,col+1) {
-			searchPath(row,col+1);
+			searchPathRec(row,col+1,e);
 		}//available path at right
 		if validate(row,col-1) {
-			searchPath(row,col-1);
+			searchPathRec(row,col-1,e);
 		}//available path at left
 		if validate(row+1,col) {
-			searchPath(row+1,col);
+			searchPathRec(row+1,col,e);
 		}//available path down
 		if validate(row-1,col) {
-			searchPath(row-1,col);
+			searchPathRec(row-1,col,e);
 		}//available path up
 		past[row][col][1] = false
 		return false//not the way
 	}
-
 }
 
 func main() {
@@ -206,7 +223,7 @@ func main() {
 	printBuilding()
 	getNumOfPeople()
 	searchPath(2,1)
-	printPast()
+	printPath()
 	/*
 	//Slice containing all the trapped people inside the building
 	//TODO: POPULATE THIS ARRAY
