@@ -11,7 +11,8 @@ Matrix building representation:
 	2 represents a person -- static matrix will place them in initial position
 	3 represents exit
 */
-var building = [12][12]int{
+var (
+	building = [12][12]int{
 			   //0 1 2 3 4 5 6 7 8 9 10 11
 				{1,1,1,1,1,1,1,1,1,1,1,1},//0
 				{1,0,0,0,1,0,0,1,0,0,0,1},//1
@@ -26,7 +27,8 @@ var building = [12][12]int{
 				{1,0,0,0,1,0,0,1,0,0,0,1},//10
 				{1,1,1,1,1,1,1,1,1,1,1,1},//11
 				}
-
+	numberOfPeople int
+)
 func printBuilding(){
 	for _,row := range building {
 		for _,col := range row{
@@ -35,16 +37,24 @@ func printBuilding(){
 		fmt.Println()
 	}
 }
-var (
-	numberOfPeople int = 5
-)
+
+func getNumOfPeople(){
+	for _,row := range building {
+		for _,col := range row{
+			if col == 2 {
+				numberOfPeople++
+			}
+		}
+	}
+	fmt.Println("Number of people: ", numberOfPeople)
+}
 
 type person struct {
 	speed float32
 }
 
 func main() {
-
+	getNumOfPeople()
 	//Slice containing all the trapped people inside the building
 	//TODO: POPULATE THIS ARRAY
 	trapped := make([]person, numberOfPeople)
