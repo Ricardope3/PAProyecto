@@ -68,7 +68,7 @@ func createWindow() *pixelgl.Window {
 	return win
 }
 
-func drawFloor() *imdraw.IMDraw {
+func drawFloor(win *pixelgl.Window) *imdraw.IMDraw {
 
 	floor := imdraw.New(nil)
 
@@ -99,17 +99,44 @@ func drawFloor() *imdraw.IMDraw {
 		y += 60.0
 	}
 
+	floor.Draw(win)
+	win.Update()
+
 	return floor
+}
+
+func drawPeople(win *pixelgl.Window) *imdraw.IMDraw {
+
+	people := imdraw.New(nil)
+	people.Color = colornames.Limegreen
+
+	var x = 90.0
+	var y = 90.0
+
+	for i := len(building) - 1; i >= 0; i-- {
+		for _, col := range building[i] {
+			if col == 2 {
+				people.Push(pixel.V(x, y))
+				people.Circle(20, 0)
+			}
+			x += 60.0
+		}
+		x = 90.0
+		y += 60.0
+	}
+
+	people.Draw(win)
+	win.Update()
+
+	return people
 }
 
 func run() {
 
 	win := createWindow()
-	floor := drawFloor()
 
-	win.Clear(colornames.Black)
-	floor.Draw(win)
-	win.Update()
+	drawFloor(win)
+	drawPeople(win)
 
 	for !win.Closed() {
 
@@ -118,29 +145,29 @@ func run() {
 
 func main() {
 
-	//Slice containing all the trapped people inside the building
-	//TODO: POPULATE THIS ARRAY
-	trapped := make([]person, numberOfPeople)
-	//Slice containing all the people that have left the building
-	safe := make([]person, numberOfPeople)
-	//Channel to handle when a person wants to move
-	onMove := make(chan person)
-	onExit := make(chan person)
+	// //Slice containing all the trapped people inside the building
+	// //TODO: POPULATE THIS ARRAY
+	// trapped := make([]person, numberOfPeople)
+	// //Slice containing all the people that have left the building
+	// safe := make([]person, numberOfPeople)
+	// //Channel to handle when a person wants to move
+	// onMove := make(chan person)
+	// onExit := make(chan person)
 
-	for {
-		select {
-		//Case when a person tryes to move from one place to another
-		case person := <-onMove:
-			//here one should modify the matrix to reflect the movement
-			//the canvas should be redrawn
-		//Case when a person left the building
-		case person := <-onExit:
-			//here the person that left the building should be erased from trapped slice
-			//here the person that left the building should be added to the safe slice
-			//the canvas should be redrawn
+	// for {
+	// 	select {
+	// 	//Case when a person tryes to move from one place to another
+	// 	case person := <-onMove:
+	// 		//here one should modify the matrix to reflect the movement
+	// 		//the canvas should be redrawn
+	// 	//Case when a person left the building
+	// 	case person := <-onExit:
+	// 		//here the person that left the building should be erased from trapped slice
+	// 		//here the person that left the building should be added to the safe slice
+	// 		//the canvas should be redrawn
 
-		}
-	}
+	// 	}
+	// }
 
 	pixelgl.Run(run)
 }
