@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 )
 
 /*
@@ -43,11 +42,11 @@ func getNumOfPeople(){
 	for _,row := range building {
 		for _,col := range row{
 			if col == 2 {
-				numberOfPeople = numberOfPeople + 1
+				numberOfPeople++
 			}
 		}
 	}
-	fmt.Println("Number of people: "+strconv.Itoa(numberOfPeople))
+	fmt.Println("Number of people: ", numberOfPeople)
 }
 
 type person struct {
