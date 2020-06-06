@@ -199,33 +199,28 @@ func searchPathRec(row int, col int,e int) bool{
 	if row == exits[e].row && col == exits[e].col { //reached end
 		return true;
 	}else{
-		deadEnd := true
 		if validate(row,col+1) {
 			if searchPathRec(row,col+1,e){
-				deadEnd = false
+				return true
 			}//;
 		}//available path at right
 		if validate(row,col-1) {
 			if searchPathRec(row,col-1,e){
-				deadEnd = false
+				return true
 			}//;
 		}//available path at left
 		if validate(row+1,col) {
 			if searchPathRec(row+1,col,e) {
-				deadEnd = false
+				return true
 			}//;
 		}//available path down
 		if validate(row-1,col) {
 			if searchPathRec(row-1,col,e) {
-				deadEnd = false
+				return true
 			}//;
 		}//available path up
-		if (deadEnd){
-			past[row][col][1] = false
-			return false//not the way
-		} else {
-			return true
-		}
+		past[row][col][1] = false
+		return false//not the way
 	}
 }
 
