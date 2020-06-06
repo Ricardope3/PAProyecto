@@ -6,6 +6,12 @@ import (
 	"time"
 )
 
+type person struct {
+	id     int
+	speed  float32
+	exited bool
+}
+
 /*
 Matrix building representation:
 	0 represents empty
@@ -13,33 +19,27 @@ Matrix building representation:
 	2 represents a person -- static matrix will place them in initial position
 	3 represents exit
 */
-var building = [12][12]int{
-	//0 1 2 3 4 5 6 7 8 9 10 11
-	{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, //0
-	{1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1}, //1
-	{1, 2, 1, 1, 1, 1, 0, 1, 1, 1, 2, 1}, //2
-	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //3
-	{1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1}, //4
-	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //5
-	{1, 0, 1, 1, 0, 0, 0, 0, 2, 1, 0, 1}, //6
-	{1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1}, //7
-	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //8
-	{1, 2, 1, 1, 1, 0, 0, 1, 1, 1, 2, 1}, //9
-	{1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1}, //10
-	{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, //11
-}
 
 var (
-	numberOfPeople int     = 5
+	building = [12][12]int{
+		//0 1 2 3 4 5 6 7 8 9 10 11
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, //0
+		{1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1}, //1
+		{1, 2, 1, 1, 1, 1, 0, 1, 1, 1, 2, 1}, //2
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //3
+		{1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1}, //4
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //5
+		{1, 0, 1, 1, 0, 0, 0, 0, 2, 1, 0, 1}, //6
+		{1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1}, //7
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //8
+		{1, 2, 1, 1, 1, 0, 0, 1, 1, 1, 2, 1}, //9
+		{1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1}, //10
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, //11
+	}
+	numberOfPeople int
 	minSpeed       float32 = 0.5
 	maxSpeed       float32 = 1.5
 )
-
-type person struct {
-	id     int
-	speed  float32
-	exited bool
-}
 
 func printBuilding() {
 	for _, row := range building {
@@ -48,6 +48,17 @@ func printBuilding() {
 		}
 		fmt.Println()
 	}
+}
+
+func getNumOfPeople() {
+	for _, row := range building {
+		for _, col := range row {
+			if col == 2 {
+				numberOfPeople++
+			}
+		}
+	}
+	fmt.Println("Number of people: ", numberOfPeople)
 }
 
 func generateRandomSpeed() float32 {
@@ -72,7 +83,7 @@ func initiatePerson(p person, onMove, onExit chan person) {
 }
 
 func main() {
-
+	getNumOfPeople()
 	trapped := make([]person, numberOfPeople)
 	safe := make([]person, 0)
 
