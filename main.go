@@ -60,6 +60,8 @@ func initiatePerson(p person, onMove, onExit chan person) {
 	go func() {
 		for {
 			time.Sleep(time.Duration(p.speed) * time.Second)
+			//MOVERTE
+			//VALIDAR SI LLEGASTE A LA SALIDA
 			if generateRandomSpeed() < 1 {
 				onExit <- p
 				return
@@ -85,8 +87,10 @@ func main() {
 	for {
 		select {
 		case person := <-onMove:
+			//REPINTAR CANVAS
 			fmt.Println(person.id, "Me movi")
 		case person := <-onExit:
+			//REPINTAR CANVAS
 			fmt.Println(person.id, "Me sali")
 			safe = append(safe, person)
 			if len(safe) >= numberOfPeople {
