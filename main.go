@@ -6,10 +6,10 @@ import (
 	"math/rand"
 	"time"
 
-	//"github.com/faiface/pixel"
-	//"github.com/faiface/pixel/imdraw"
-	//"github.com/faiface/pixel/pixelgl"
-	//"golang.org/x/image/colornames"
+	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
+	"github.com/faiface/pixel/pixelgl"
+	"golang.org/x/image/colornames"
 )
 
 type person struct {
@@ -370,7 +370,7 @@ func run() {
 				elapsed := time.Since(start)
 				seconds := elapsed.Seconds()
 				if seconds > timeout {
-					//win.Clear(colornames.White)
+					win.Clear(colornames.White)
 				}
 			}
 		}
