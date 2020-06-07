@@ -400,15 +400,16 @@ func run() {
 				if len(safe) >= numberOfPeople {
 					close(onMove)
 					done <- true
+					printLabels(win)
 					return
 				}
 			default:
 				elapsed := time.Since(start)
 				seconds := elapsed.Seconds()
 				if seconds > timeout {
-					//win.Clear(colornames.White)
-					//fmt.Println("Timeout")
 					printLabels(win)
+					done <- true
+					return
 				}
 			}
 		}
