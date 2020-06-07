@@ -349,6 +349,10 @@ func run() {
 	for i := 0; i < numberOfPeople; i++ {
 		searchPath(people[i].row, people[i].col)
 		trapped[i] = person{i, generateRandomSpeed(), false, path, 0, path[len(path)-1]}
+		fmt.Println("person",trapped[i].id)
+		for _, pat := range trapped[i].path {
+			fmt.Println("x: ", pat.row, "y: ", pat.col)
+		}
 		go initiatePerson(trapped[i], onMove, onExit, trapped)
 	}
 	go func() {
@@ -392,7 +396,7 @@ func movePerson(p person) {
 	nextPoint := p.path[lenP-p.position-1]
 	building[prevPoint.row][prevPoint.col] = 0
 	building[nextPoint.row][nextPoint.col] = 2
-	p.curr_position = nextPoint
+	fmt.Println(p.id,":",p.curr_position)
 }
 
 func generateRandomSpeed() float32 {
@@ -425,6 +429,8 @@ func initiatePerson(p person, onMove, onExit chan person, trapped []person) {
 						break
 					}
 				}
+			} else {
+				p.curr_position = nextPoint
 			}
 			onMove <- p
 		}
@@ -432,5 +438,5 @@ func initiatePerson(p person, onMove, onExit chan person, trapped []person) {
 }
 
 func main() {
-	pixelgl.Run(run)
+/pixelgl.Run(run)
 }
