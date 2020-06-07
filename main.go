@@ -13,10 +13,10 @@ import (
 )
 
 type person struct {
-	id     int
-	speed  float32
-	exited bool
-	path   []coordinate
+	id       int
+	speed    float32
+	exited   bool
+	path     []coordinate
 	position int
 }
 
@@ -50,8 +50,8 @@ var (
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, //11
 	}
 	numberOfPeople int
-	minSpeed       float32 = 0.5
-	maxSpeed       float32 = 1.5
+	minSpeed       float32 = 1.5
+	maxSpeed       float32 = 2.5
 	numberOfExits  int
 	exits          [5]coordinate
 	past           [12][12][2]bool //0:whether it has been visited 1:whether it formas part of the path
@@ -347,7 +347,7 @@ func run() {
 
 	for i := 0; i < numberOfPeople; i++ {
 		searchPath(people[i].row, people[i].col)
-		trapped[i] = person{i, float32(i + 2), false, path, 0}
+		trapped[i] = person{i, generateRandomSpeed(), false, path, 0}
 		go initiatePerson(trapped[i], onMove, onExit)
 	}
 	go func() {
@@ -357,10 +357,14 @@ func run() {
 				//REPINTAR CANVAS
 				movePerson(person)
 				fmt.Println(person.id, "Me movi")
+				drawFloor(win)
+				drawPeople(win)
 			case person := <-onExit:
 				//REPINTAR CANVAS
 				fmt.Println(person.id, "Me sali")
 				safe = append(safe, person)
+				drawFloor(win)
+				drawPeople(win)
 				if len(safe) >= numberOfPeople {
 					close(onMove)
 					done <- true
@@ -370,18 +374,18 @@ func run() {
 				elapsed := time.Since(start)
 				seconds := elapsed.Seconds()
 				if seconds > timeout {
-					win.Clear(colornames.White)
+					// win.Clear(colornames.White)
 				}
 			}
 		}
 	}()
-	<- done
+	<-done
 	for !win.Closed() {
 		win.Update()
 	}
 }
 
-func movePerson(p person){
+func movePerson(p person) {
 	lenP := len(p.path)
 	prevPoint := p.path[lenP-p.position]
 	nextPoint := p.path[lenP-p.position-1]
@@ -415,5 +419,5 @@ func initiatePerson(p person, onMove, onExit chan person) {
 func main() {
 
 	pixelgl.Run(run)
-	
+
 }
