@@ -13,10 +13,12 @@ import (
 )
 
 type person struct {
-	id     int
-	speed  float32
-	exited bool
-	path   []coordinate
+	id            int
+	speed         float32
+	exited        bool
+	path          []coordinate
+	position      int
+	curr_position coordinate
 }
 
 type coordinate struct {
@@ -36,21 +38,21 @@ var (
 	building = [][]int{
 		//0 1 2 3 4 5 6 7 8 9 10 11
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, //0
-		{1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1}, //1
-		{1, 2, 1, 1, 1, 1, 0, 1, 1, 1, 2, 1}, //2
+		{1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 2, 1}, //1
+		{1, 2, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1}, //2
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //3
 		{1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1}, //4
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //5
-		{1, 0, 1, 1, 0, 0, 0, 0, 2, 1, 0, 1}, //6
+		{1, 0, 1, 1, 0, 2, 0, 0, 2, 1, 0, 1}, //6
 		{1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1}, //7
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //8
-		{1, 2, 1, 1, 1, 0, 0, 1, 1, 1, 2, 1}, //9
+		{1, 2, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1}, //9
 		{1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1}, //10
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, //11
 	}
 	numberOfPeople int
-	minSpeed       float32 = 0.5
-	maxSpeed       float32 = 1.5
+	minSpeed       float32 = 1.5
+	maxSpeed       float32 = 2.5
 	numberOfExits  int
 	exits          [5]coordinate
 	past           [12][12][2]bool //0:whether it has been visited 1:whether it formas part of the path
@@ -206,6 +208,7 @@ func searchPath(row int, col int) bool {
 	position := coordinate{row, col}
 	e := findClosestExit(position) //index of target exit
 	initializePast()
+	path = make([]coordinate, 0)
 	return searchPathRec(row, col, e)
 }
 
@@ -335,44 +338,67 @@ func run() {
 	initializePast()
 	generateExits(building)
 	getNumOfPeople()
+	printPathMatrix()
 	trapped := make([]person, numberOfPeople)
 	safe := make([]person, 0)
 
+	done := make(chan bool)
 	onMove := make(chan person)
 	onExit := make(chan person)
 	start := time.Now()
 
 	for i := 0; i < numberOfPeople; i++ {
 		searchPath(people[i].row, people[i].col)
-		trapped[i] = person{i, float32(i + 2), false, path}
-		go initiatePerson(trapped[i], onMove, onExit)
+
+		trapped[i] = person{i, generateRandomSpeed(), false, path, 0, path[len(path)-1]}
+		fmt.Println("person", trapped[i].id)
+		// for _, pat := range trapped[i].path {
+		// 	fmt.Println("x: ", pat.row, "y: ", pat.col)
+		// }
+		go initiatePerson(trapped[i], onMove, onExit, trapped)
 	}
 	go func() {
 		for {
 			select {
 			case person := <-onMove:
 				//REPINTAR CANVAS
+				movePerson(person)
 				fmt.Println(person.id, "Me movi")
+				drawFloor(win)
+				drawPeople(win)
 			case person := <-onExit:
 				//REPINTAR CANVAS
 				fmt.Println(person.id, "Me sali")
 				safe = append(safe, person)
+				drawFloor(win)
+				drawPeople(win)
 				if len(safe) >= numberOfPeople {
 					close(onMove)
+					done <- true
 					return
 				}
 			default:
 				elapsed := time.Since(start)
 				seconds := elapsed.Seconds()
 				if seconds > timeout {
-					win.Clear(colornames.White)
+					// win.Clear(colornames.White)
 				}
 			}
 		}
 	}()
+	<-done
 	for !win.Closed() {
 		win.Update()
 	}
+}
+
+func movePerson(p person) {
+	lenP := len(p.path)
+	prevPoint := p.path[lenP-p.position]
+	nextPoint := p.path[lenP-p.position-1]
+	building[prevPoint.row][prevPoint.col] = 0
+	building[nextPoint.row][nextPoint.col] = 2
+	fmt.Println(p.id, ":", p.curr_position)
 }
 
 func generateRandomSpeed() float32 {
@@ -381,15 +407,32 @@ func generateRandomSpeed() float32 {
 	return minSpeed + r1.Float32()*(maxSpeed-minSpeed)
 }
 
-func initiatePerson(p person, onMove, onExit chan person) {
+func initiatePerson(p person, onMove, onExit chan person, trapped []person) {
 	go func() {
 		for {
 			time.Sleep(time.Duration(p.speed) * time.Second)
 			//MOVERTE
 			//VALIDAR SI LLEGASTE A LA SALIDA
-			if generateRandomSpeed() < 1 {
+			if p.position >= len(p.path)-1 {
+				building[p.path[0].row][p.path[0].col] = 3
+				p.exited = true
 				onExit <- p
 				return
+			}
+			p.position++
+			lenP := len(p.path)
+			nextPoint := p.path[lenP-p.position-1]
+			if building[nextPoint.row][nextPoint.col] == 2 {
+				for _, person := range trapped {
+					if person.curr_position == nextPoint && !person.exited {
+						fmt.Println(p.id, ": Disculpe senior ", person.id)
+						p.speed = person.speed * 2
+						p.position--
+						break
+					}
+				}
+			} else {
+				p.curr_position = nextPoint
 			}
 			onMove <- p
 		}
@@ -397,6 +440,5 @@ func initiatePerson(p person, onMove, onExit chan person) {
 }
 
 func main() {
-
 	pixelgl.Run(run)
 }
