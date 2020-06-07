@@ -9,7 +9,9 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/faiface/pixel/text"
 	"golang.org/x/image/colornames"
+	"golang.org/x/image/font/basicfont"
 )
 
 type person struct {
@@ -329,6 +331,29 @@ func drawPeople(win *pixelgl.Window) *imdraw.IMDraw {
 	return people
 }
 
+func printLabels(win *pixelgl.Window) {
+
+	var trapped = 0
+
+	for _, row := range building {
+		for _, col := range row {
+			if col == 2 {
+				trapped++
+			}
+		}
+	}
+
+	txt := text.NewAtlas(basicfont.Face7x13, text.ASCII)
+
+	others := text.New(pixel.V(60, 30), txt)
+	others.Color = colornames.White
+	fmt.Fprintf(others, "Excited: %d - Trapped: %d", numberOfPeople-trapped, trapped)
+
+	others.Draw(win, pixel.IM.Scaled(others.Orig, 1.8))
+	win.Update()
+
+}
+
 func run() {
 
 	win := createWindow()
@@ -381,7 +406,9 @@ func run() {
 				elapsed := time.Since(start)
 				seconds := elapsed.Seconds()
 				if seconds > timeout {
-					// win.Clear(colornames.White)
+					//win.Clear(colornames.White)
+					//fmt.Println("Timeout")
+					printLabels(win)
 				}
 			}
 		}
