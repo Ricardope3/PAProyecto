@@ -6,10 +6,10 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/imdraw"
-	"github.com/faiface/pixel/pixelgl"
-	"golang.org/x/image/colornames"
+	//"github.com/faiface/pixel"
+	//"github.com/faiface/pixel/imdraw"
+	//"github.com/faiface/pixel/pixelgl"
+	//"golang.org/x/image/colornames"
 )
 
 type person struct {
@@ -17,6 +17,7 @@ type person struct {
 	speed  float32
 	exited bool
 	path   []coordinate
+	position int
 }
 
 type coordinate struct {
@@ -335,16 +336,18 @@ func run() {
 	initializePast()
 	generateExits(building)
 	getNumOfPeople()
+	printPathMatrix()
 	trapped := make([]person, numberOfPeople)
 	safe := make([]person, 0)
 
+	done := make(chan bool)
 	onMove := make(chan person)
 	onExit := make(chan person)
 	start := time.Now()
 
 	for i := 0; i < numberOfPeople; i++ {
 		searchPath(people[i].row, people[i].col)
-		trapped[i] = person{i, float32(i + 2), false, path}
+		trapped[i] = person{i, float32(i + 2), false, path, 0}
 		go initiatePerson(trapped[i], onMove, onExit)
 	}
 	go func() {
@@ -352,6 +355,7 @@ func run() {
 			select {
 			case person := <-onMove:
 				//REPINTAR CANVAS
+				movePerson(person)
 				fmt.Println(person.id, "Me movi")
 			case person := <-onExit:
 				//REPINTAR CANVAS
@@ -359,20 +363,30 @@ func run() {
 				safe = append(safe, person)
 				if len(safe) >= numberOfPeople {
 					close(onMove)
+					done <- true
 					return
 				}
 			default:
 				elapsed := time.Since(start)
 				seconds := elapsed.Seconds()
 				if seconds > timeout {
-					win.Clear(colornames.White)
+					//win.Clear(colornames.White)
 				}
 			}
 		}
 	}()
+	<- done
 	for !win.Closed() {
 		win.Update()
 	}
+}
+
+func movePerson(p person){
+	lenP := len(p.path)
+	prevPoint := p.path[lenP-p.position]
+	nextPoint := p.path[lenP-p.position-1]
+	building[prevPoint.row][prevPoint.col] = 0
+	building[nextPoint.row][nextPoint.col] = 2
 }
 
 func generateRandomSpeed() float32 {
@@ -387,10 +401,12 @@ func initiatePerson(p person, onMove, onExit chan person) {
 			time.Sleep(time.Duration(p.speed) * time.Second)
 			//MOVERTE
 			//VALIDAR SI LLEGASTE A LA SALIDA
-			if generateRandomSpeed() < 1 {
+			if p.position >= len(p.path)-1 {
+				building[p.path[0].row][p.path[0].col] = 0
 				onExit <- p
 				return
 			}
+			p.position++
 			onMove <- p
 		}
 	}()
@@ -399,4 +415,5 @@ func initiatePerson(p person, onMove, onExit chan person) {
 func main() {
 
 	pixelgl.Run(run)
+	
 }
