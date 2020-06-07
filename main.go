@@ -8,7 +8,10 @@ import (
 )
 
 type person struct {
-	speed float32
+	id     int
+	speed  float32
+	exited bool
+	path []coordinate
 }
 
 type coordinate struct {
@@ -40,9 +43,12 @@ var (
 				{1,1,1,1,1,1,1,1,1,1,1,1},//11
 				}
 	numberOfPeople int
+	minSpeed       float32 = 0.5
+	maxSpeed       float32 = 1.5
 	numberOfExits int
 	exits [5]coordinate
 	past [12][12][2]bool //0:whether it has been visited 1:whether it formas part of the path
+	path []coordinate
 )
 
 func initializePast(){
@@ -72,7 +78,7 @@ func printPast(){
 	}
 }
 
-func printPath(){
+func printPathMatrix(){
 	for i,row := range building {
 		for j,col := range row{
 			if past[i][j][1] == true && past[i][j][0] == true{
@@ -197,25 +203,30 @@ func searchPath(row int, col int) bool{
 func searchPathRec(row int, col int,e int) bool{
 	past[row][col][0] = true;//mark visited
 	if row == exits[e].row && col == exits[e].col { //reached end
+		path = append(path,coordinate{row,col})
 		return true;
 	}else{
 		if validate(row,col+1) {
 			if searchPathRec(row,col+1,e){
+				path = append(path,coordinate{row,col})
 				return true
 			}//;
 		}//available path at right
 		if validate(row,col-1) {
 			if searchPathRec(row,col-1,e){
+				path = append(path,coordinate{row,col})
 				return true
 			}//;
 		}//available path at left
 		if validate(row+1,col) {
 			if searchPathRec(row+1,col,e) {
+				path = append(path,coordinate{row,col})
 				return true
 			}//;
 		}//available path down
 		if validate(row-1,col) {
 			if searchPathRec(row-1,col,e) {
+				path = append(path,coordinate{row,col})
 				return true
 			}//;
 		}//available path up
@@ -224,36 +235,152 @@ func searchPathRec(row int, col int,e int) bool{
 	}
 }
 
+func createWindow() *pixelgl.Window {
+
+	// Specify configuration window
+	cfg := pixelgl.WindowConfig{
+		Title:  "Eathquake Evacuation Simulator",
+		Bounds: pixel.R(0, 0, 840, 840),
+		VSync:  true,
+	}
+
+	// Create a new window
+	win, err := pixelgl.NewWindow(cfg)
+	if err != nil {
+		panic(err)
+	}
+
+	win.Clear(colornames.Black)
+	return win
+}
+
+func drawFloor(win *pixelgl.Window) *imdraw.IMDraw {
+
+	floor := imdraw.New(nil)
+
+	floor.Color = colornames.Lightgray
+	floor.Push(pixel.V(60, 60))
+	floor.Push(pixel.V(780, 780))
+	floor.Rectangle(0)
+
+	var x = 60.0
+	var y = 60.0
+
+	for i := len(building) - 1; i >= 0; i-- {
+		for _, col := range building[i] {
+			if col == 1 {
+				floor.Color = colornames.Gray
+				floor.Push(pixel.V(x, y))
+				floor.Push(pixel.V(x+60.0, y+60.0))
+				floor.Rectangle(0)
+			} else if col == 3 {
+				floor.Color = colornames.Red
+				floor.Push(pixel.V(x, y))
+				floor.Push(pixel.V(x+60.0, y+60.0))
+				floor.Rectangle(0)
+			}
+			x += 60.0
+		}
+		x = 60.0
+		y += 60.0
+	}
+
+	floor.Draw(win)
+	win.Update()
+
+	return floor
+}
+
+func drawPeople(win *pixelgl.Window) *imdraw.IMDraw {
+
+	people := imdraw.New(nil)
+	people.Color = colornames.Limegreen
+
+	var x = 90.0
+	var y = 90.0
+
+	for i := len(building) - 1; i >= 0; i-- {
+		for _, col := range building[i] {
+			if col == 2 {
+				people.Push(pixel.V(x, y))
+				people.Circle(20, 0)
+			}
+			x += 60.0
+		}
+		x = 90.0
+		y += 60.0
+	}
+
+	people.Draw(win)
+	win.Update()
+
+	return people
+}
+
+func run() {
+
+	win := createWindow()
+
+	drawFloor(win)
+	drawPeople(win)
+
+	for !win.Closed() {
+
+	}
+}
+
+func generateRandomSpeed() float32 {
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
+	return minSpeed + r1.Float32()*(maxSpeed-minSpeed)
+}
+
+func initiatePerson(p person, onMove, onExit chan person) {
+	go func() {
+		for {
+			time.Sleep(time.Duration(p.speed) * time.Second)
+			//MOVERTE
+			//VALIDAR SI LLEGASTE A LA SALIDA
+			if generateRandomSpeed() < 1 {
+				onExit <- p
+				return
+			}
+			onMove <- p
+		}
+	}()
+}
+
 func main() {
 	initializePast()
-	printPast()
 	generateExits(building)
-	printBuilding()
 	getNumOfPeople()
-	searchPath(2,1)
-	printPath()
-	/*
-	//Slice containing all the trapped people inside the building
-	//TODO: POPULATE THIS ARRAY
+	
 	trapped := make([]person, numberOfPeople)
-	//Slice containing all the people that have left the building
-	safe := make([]person, numberOfPeople)
-	//Channel to handle when a person wants to move
+	safe := make([]person, 0)
+
 	onMove := make(chan person)
 	onExit := make(chan person)
 
+	for i := 0; i < numberOfPeople; i++ {
+		trapped[i] = person{i, float32(i + 2), false}
+		go initiatePerson(trapped[i], onMove, onExit)
+	}
+
 	for {
 		select {
-		//Case when a person tryes to move from one place to another
 		case person := <-onMove:
-			//here one should modify the matrix to reflect the movement
-			//the canvas should be redrawn
-		//Case when a person left the building
+			//REPINTAR CANVAS
+			fmt.Println(person.id, "Me movi")
 		case person := <-onExit:
-			//here the person that left the building should be erased from trapped slice
-			//here the person that left the building should be added to the safe slice
-			//the canvas should be redrawn
-
+			//REPINTAR CANVAS
+			fmt.Println(person.id, "Me sali")
+			safe = append(safe, person)
+			if len(safe) >= numberOfPeople {
+				close(onMove)
+				return
+			}
 		}
-	}*/
+	}
+
+	pixelgl.Run(run)
 }
