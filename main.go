@@ -16,7 +16,7 @@ type person struct {
 	id     int
 	speed  float32
 	exited bool
-	// path   []coordinate
+	path   []coordinate
 }
 
 type coordinate struct {
@@ -56,6 +56,7 @@ var (
 	past           [12][12][2]bool //0:whether it has been visited 1:whether it formas part of the path
 	path           []coordinate
 	timeout        float64 = 5
+	people []coordinate
 )
 
 func initializePast() {
@@ -103,6 +104,7 @@ func getNumOfPeople() {
 	for _, row := range building {
 		for _, col := range row {
 			if col == 2 {
+				people = append(people, coordinate{row, col})
 				numberOfPeople++
 			}
 		}
@@ -341,7 +343,8 @@ func run() {
 	start := time.Now()
 
 	for i := 0; i < numberOfPeople; i++ {
-		trapped[i] = person{i, float32(i + 2), false}
+		searchPath(people[i].row,people[i].col)
+		trapped[i] = person{i, float32(i + 2), false,path}
 		go initiatePerson(trapped[i], onMove, onExit)
 	}
 	go func() {
