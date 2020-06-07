@@ -4,6 +4,11 @@ import (
 	"fmt"
 	"math/rand"
 	"math"
+	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
+	"github.com/faiface/pixel/pixelgl"
+	"golang.org/x/image/colornames"
+	"math/rand"
 	"time"
 )
 
@@ -26,6 +31,7 @@ Matrix building representation:
 	2 represents a person -- static matrix will place them in initial position
 	3 represents exit
 */
+
 var (
 	building = [][]int{
 			   //0 1 2 3 4 5 6 7 8 9 10 11
@@ -60,9 +66,9 @@ func initializePast(){
 	}
 }
 
-func printBuilding(){
-	for _,row := range building {
-		for _,col := range row{
+func printBuilding() {
+	for _, row := range building {
+		for _, col := range row {
 			fmt.Print(col)
 		}
 		fmt.Println()
@@ -354,7 +360,6 @@ func main() {
 	initializePast()
 	generateExits(building)
 	getNumOfPeople()
-	
 	trapped := make([]person, numberOfPeople)
 	safe := make([]person, 0)
 
