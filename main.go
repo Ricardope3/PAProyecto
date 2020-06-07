@@ -56,7 +56,7 @@ var (
 	past           [12][12][2]bool //0:whether it has been visited 1:whether it formas part of the path
 	path           []coordinate
 	timeout        float64 = 5
-	people []coordinate
+	people         []coordinate
 )
 
 func initializePast() {
@@ -101,10 +101,10 @@ func printPathMatrix() {
 }
 
 func getNumOfPeople() {
-	for _, row := range building {
-		for _, col := range row {
+	for i, row := range building {
+		for j, col := range row {
 			if col == 2 {
-				people = append(people, coordinate{row, col})
+				people = append(people, coordinate{i, j})
 				numberOfPeople++
 			}
 		}
@@ -343,8 +343,8 @@ func run() {
 	start := time.Now()
 
 	for i := 0; i < numberOfPeople; i++ {
-		searchPath(people[i].row,people[i].col)
-		trapped[i] = person{i, float32(i + 2), false,path}
+		searchPath(people[i].row, people[i].col)
+		trapped[i] = person{i, float32(i + 2), false, path}
 		go initiatePerson(trapped[i], onMove, onExit)
 	}
 	go func() {
