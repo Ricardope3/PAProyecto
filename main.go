@@ -463,6 +463,14 @@ func initiatePerson(p person, onMove, onExit chan person, trapped []person) {
 			} else {
 				p.curr_position = nextPoint
 			}
+			for _,person := range trapped {
+				if person.id != p.id && p.position == person.position {
+					fmt.Println(p.id, ": nonono despues de usted senior ", person.id)
+					p.speed = person.speed*2
+					p.position--
+					break
+				}
+			}
 			onMove <- p
 		}
 	}()
