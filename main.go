@@ -9,15 +9,17 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/faiface/pixel/text"
 	"golang.org/x/image/colornames"
+	"golang.org/x/image/font/basicfont"
 )
 
 type person struct {
-	id       int
-	speed    float32
-	exited   bool
-	path     []coordinate
-	position int
+	id            int
+	speed         float32
+	exited        bool
+	path          []coordinate
+	position      int
 	curr_position coordinate
 }
 
@@ -38,15 +40,15 @@ var (
 	building = [][]int{
 		//0 1 2 3 4 5 6 7 8 9 10 11
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, //0
-		{1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1}, //1
-		{1, 2, 1, 1, 1, 1, 0, 1, 1, 1, 2, 1}, //2
+		{1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 2, 1}, //1
+		{1, 2, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1}, //2
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //3
 		{1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1}, //4
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //5
-		{1, 0, 1, 1, 0, 0, 0, 0, 2, 1, 0, 1}, //6
+		{1, 0, 1, 1, 0, 2, 0, 0, 2, 1, 0, 1}, //6
 		{1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1}, //7
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //8
-		{1, 2, 1, 1, 1, 0, 0, 1, 1, 1, 2, 1}, //9
+		{1, 2, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1}, //9
 		{1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1}, //10
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, //11
 	}
@@ -208,6 +210,7 @@ func searchPath(row int, col int) bool {
 	position := coordinate{row, col}
 	e := findClosestExit(position) //index of target exit
 	initializePast()
+	path = make([]coordinate, 0)
 	return searchPathRec(row, col, e)
 }
 
@@ -328,6 +331,29 @@ func drawPeople(win *pixelgl.Window) *imdraw.IMDraw {
 	return people
 }
 
+func printLabels(win *pixelgl.Window) {
+
+	var trapped = 0
+
+	for _, row := range building {
+		for _, col := range row {
+			if col == 2 {
+				trapped++
+			}
+		}
+	}
+
+	txt := text.NewAtlas(basicfont.Face7x13, text.ASCII)
+
+	others := text.New(pixel.V(60, 30), txt)
+	others.Color = colornames.White
+	fmt.Fprintf(others, "Excited: %d - Trapped: %d", numberOfPeople-trapped, trapped)
+
+	others.Draw(win, pixel.IM.Scaled(others.Orig, 1.8))
+	win.Update()
+
+}
+
 func run() {
 
 	win := createWindow()
@@ -348,8 +374,12 @@ func run() {
 
 	for i := 0; i < numberOfPeople; i++ {
 		searchPath(people[i].row, people[i].col)
+
 		trapped[i] = person{i, generateRandomSpeed(), false, path, 0, path[len(path)-1]}
-		fmt.Println("person",trapped[i].id)
+		fmt.Println("person", trapped[i].id)
+		// for _, pat := range trapped[i].path {
+		// 	fmt.Println("x: ", pat.row, "y: ", pat.col)
+		// }
 		go initiatePerson(trapped[i], onMove, onExit, trapped)
 	}
 	go func() {
@@ -371,13 +401,16 @@ func run() {
 				if len(safe) >= numberOfPeople {
 					close(onMove)
 					done <- true
+					printLabels(win)
 					return
 				}
 			default:
 				elapsed := time.Since(start)
 				seconds := elapsed.Seconds()
 				if seconds > timeout {
-					// win.Clear(colornames.White)
+					printLabels(win)
+					done <- true
+					return
 				}
 			}
 		}
@@ -394,6 +427,7 @@ func movePerson(p person) {
 	nextPoint := p.path[lenP-p.position-1]
 	building[prevPoint.row][prevPoint.col] = 0
 	building[nextPoint.row][nextPoint.col] = 2
+	fmt.Println(p.id, ":", p.curr_position)
 }
 
 func generateRandomSpeed() float32 {
@@ -409,7 +443,7 @@ func initiatePerson(p person, onMove, onExit chan person, trapped []person) {
 			//MOVERTE
 			//VALIDAR SI LLEGASTE A LA SALIDA
 			if p.position >= len(p.path)-1 {
-				building[p.path[0].row][p.path[0].col] = 0
+				building[p.path[0].row][p.path[0].col] = 3
 				p.exited = true
 				onExit <- p
 				return
@@ -417,11 +451,11 @@ func initiatePerson(p person, onMove, onExit chan person, trapped []person) {
 			p.position++
 			lenP := len(p.path)
 			nextPoint := p.path[lenP-p.position-1]
-			if (building[nextPoint.row][nextPoint.col] == 2) {
+			if building[nextPoint.row][nextPoint.col] == 2 {
 				for _, person := range trapped {
-					if	(person.curr_position == nextPoint && !person.exited) {
-						fmt.Println(p.id,": Disculpe senior ",person.id)
-						p.speed=person.speed*2
+					if person.curr_position == nextPoint && !person.exited {
+						fmt.Println(p.id, ": Disculpe senior ", person.id)
+						p.speed = person.speed * 2
 						p.position--
 						break
 					}
