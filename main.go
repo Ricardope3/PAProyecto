@@ -1,9 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"math"
 	"math/rand"
+	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/faiface/pixel"
@@ -356,6 +360,19 @@ func printLabels(win *pixelgl.Window) {
 
 func run() {
 
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Println("Enter earthquake timeout in seconds:")
+	toutInput, _ := reader.ReadString('\n')
+	toutInput = strings.Replace(toutInput, "\n", "", -1)
+	tout, err := strconv.ParseFloat(toutInput, 64)
+
+	timeout = tout
+
+	if err != nil {
+		os.Exit(-1)
+	}
+
 	win := createWindow()
 
 	drawFloor(win)
@@ -463,10 +480,10 @@ func initiatePerson(p person, onMove, onExit chan person, trapped []person) {
 			} else {
 				p.curr_position = nextPoint
 			}
-			for _,person := range trapped {
+			for _, person := range trapped {
 				if person.id != p.id && p.position == person.position {
 					fmt.Println(p.id, ": nonono despues de usted senior ", person.id)
-					p.speed = person.speed*2
+					p.speed = person.speed * 2
 					p.position--
 					break
 				}
