@@ -395,20 +395,22 @@ func run() {
 				//REPINTAR CANVAS
 				fmt.Println(person.id, "Me sali")
 				safe = append(safe, person)
+				printBuilding()
 				drawFloor(win)
 				drawPeople(win)
 				if len(safe) >= numberOfPeople {
 					close(onMove)
 					done <- true
+					printLabels(win)
 					return
 				}
 			default:
 				elapsed := time.Since(start)
 				seconds := elapsed.Seconds()
 				if seconds > timeout {
-					//win.Clear(colornames.White)
-					//fmt.Println("Timeout")
 					printLabels(win)
+					done <- true
+					return
 				}
 			}
 		}
@@ -460,6 +462,14 @@ func initiatePerson(p person, onMove, onExit chan person, trapped []person) {
 				}
 			} else {
 				p.curr_position = nextPoint
+			}
+			for _,person := range trapped {
+				if person.id != p.id && p.position == person.position {
+					fmt.Println(p.id, ": nonono despues de usted senior ", person.id)
+					p.speed = person.speed*2
+					p.position--
+					break
+				}
 			}
 			onMove <- p
 		}
