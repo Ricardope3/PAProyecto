@@ -18,9 +18,9 @@
  * time
 * installed
  * [pixel](https://github.com/faiface/pixel)
- * [pixel/imdraw](https://github.com/faiface/pixel/imdraw)
- * [pixel/pixelgl](https://github.com/faiface/pixel/pixelgl)
- * [pixel/text](https://github.com/faiface/pixel/text)
+  * pixel/imdraw
+  * pixel/pixelgl
+  * pixel/text
  * [colornames](https://godoc.org/golang.org/x/image/colornames)
  * [font/basicfont](https://godoc.org/golang.org/x/image/font/basicfont)
 # Structs
