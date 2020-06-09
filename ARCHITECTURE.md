@@ -4,6 +4,7 @@
 `go get github.com/faiface/glhf`
 
 `go get github.com/go-gl/glfw/v3.2/glfw`
+- on macOS only: xcode-select --install
 
 # Threads
 - main thread executes the run method
