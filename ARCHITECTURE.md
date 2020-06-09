@@ -1,3 +1,10 @@
+# Requiremtents
+`go get github.com/faiface/pixel`
+
+`go get github.com/faiface/glhf`
+
+`go get github.com/go-gl/glfw/v3.2/glfw`
+
 # Threads
 - main thread executes the run method
 - the run method executes each person's goroutine
