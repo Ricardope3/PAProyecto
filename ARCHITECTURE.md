@@ -36,7 +36,7 @@
   * col (int): y coordinate, or column number
 * person
   * id (int): person's id
-  * peed (float32): person's slowness, the bigger the slower
+  * speed (float32): person's slowness, the bigger the slower
   * exited (bool): wheter a person has reached the exit or not
   * path ([]coordinate): the path to the exit represented as an array of coordinates
   * position (int): number of places moved from the starting point
