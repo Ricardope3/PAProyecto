@@ -7,22 +7,22 @@
 ![](assets/threads.png)
 # Libraries
 * built-in
- * bufio
- * fmt
- * math
- * math/rand
- * os
- * strconv
- * strconv
- * strings
- * time
+  * bufio
+  * fmt
+  * math
+  * math/rand
+  * os
+  * strconv
+  * strconv
+  * strings
+  * time
 * installed
- * [pixel](https://github.com/faiface/pixel)
-  * pixel/imdraw
-  * pixel/pixelgl
-  * pixel/text
- * [colornames](https://godoc.org/golang.org/x/image/colornames)
- * [font/basicfont](https://godoc.org/golang.org/x/image/font/basicfont)
+  * [pixel](https://github.com/faiface/pixel)
+   * pixel/imdraw
+   * pixel/pixelgl
+   * pixel/text
+  * [colornames](https://godoc.org/golang.org/x/image/colornames)
+  * [font/basicfont](https://godoc.org/golang.org/x/image/font/basicfont)
 # Structs
 * coordinate
   * row (int): x coordinate, or row number
