@@ -41,7 +41,19 @@
 * printPathMatrix()
 * getNumOfPeople()
 * generateExits(floor [][]int)
+  * Function that receives building matrix, and randomly generates a random number of exits on its borders
+  * Parameters
+    * floor ([][]int): matrix that represents the map of the building
 * insertExit(floor [][]int, sideExits []int, side int, indexExit int, lenF int) bool
+  * Function that inserts an exit on a random position of the border of the matrix
+  * Parameters
+    * floor ([][]int): matrix that represents the map of the building
+    * sideExits ([]int): an array that has a counter of exits for each border
+    * side (int): the border where the exit is going to be inserted (0 up, 1 right, 2 down, 3 left)
+    * indexExit (int): the index where the exit is going to be inserted
+    * lenF (int): The length of the side of the matrix
+  * Returns
+   * bool: returns true if the exit was inserted, returns false if it was not
 * distance(a coordinate, b coordinate) float64
 * findClosestExit(position coordinate) int
 * validate(row int, col int) bool
@@ -52,6 +64,9 @@
 * printLabels(win \*pixelgl.Window)
 * run()
 * movePerson(p person)
+  * Moves a person to its next position on its path atribute
+  * Paratemters
+    * p (person): The person that is going to be moved
 * generateRandomSpeed() float32
 * initiatePerson(p person, onMove chan person, onExit chan person, trapped []person)
 * main()
