@@ -46,7 +46,7 @@
 * printBuilding()
   * Prints the building matrix
 * printPast()
-  * Prints the past, which is an array containing the possible routes of a person to an exit
+  * Prints the past, which is a matrix indicating which are the cells forming the exit path of a person.
 * printPathMatrix()
   * Prints the matrix that represents the path of a person in the matrix
 * getNumOfPeople()
@@ -73,9 +73,13 @@
   * Returns
     * float64: The distance between a and b
 * findClosestExit(position coordinate) int
+    * Uses distance function to return the index of the exit coordinate closest in distance to the initial position of a person.
 * validate(row int, col int) bool
+    * Checks if a cell in the building matrix is viable to be part of the exit path of a person.
 * searchPath(row int, col int) bool
+    * Generates the coordinates that conform the path of a person.
 * searchPathRec(row int, col int, e int) bool
+    * Does backtracking using recursion to find the exit path of a person.
 * createWindow() \*pixelgl.Window
 * drawFloor(win \*pixelgl.Window) \*imdraw.IMDraw
 * drawPeople(win \*pixelgl.Window) \*imdraw.IMDraw
