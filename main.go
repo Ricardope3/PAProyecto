@@ -49,11 +49,11 @@ var (
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //3
 		{1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1}, //4
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //5
-		{1, 0, 1, 1, 0, 2, 0, 0, 2, 1, 0, 1}, //6
+		{1, 0, 1, 1, 0, 2, 0, 0, 0, 1, 0, 1}, //6
 		{1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1}, //7
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, //8
 		{1, 2, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1}, //9
-		{1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1}, //10
+		{1, 0, 0, 0, 1, 0, 0, 1, 2, 0, 0, 1}, //10
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, //11
 	}
 	numberOfPeople int
@@ -351,7 +351,7 @@ func printLabels(win *pixelgl.Window) {
 
 	others := text.New(pixel.V(60, 30), txt)
 	others.Color = colornames.White
-	fmt.Fprintf(others, "Excited: %d - Trapped: %d", numberOfPeople-trapped, trapped)
+	fmt.Fprintf(others, "Exited: %d - Trapped: %d", numberOfPeople-trapped, trapped)
 
 	others.Draw(win, pixel.IM.Scaled(others.Orig, 1.8))
 	win.Update()
