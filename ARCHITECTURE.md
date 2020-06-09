@@ -75,6 +75,7 @@
 * findClosestExit(position coordinate) int
 * validate(row int, col int) bool
 * searchPath(row int, col int) bool
+* searchPathRec(row int, col int, e int) bool
 * createWindow() \*pixelgl.Window
 * drawFloor(win \*pixelgl.Window) \*imdraw.IMDraw
 * drawPeople(win \*pixelgl.Window) \*imdraw.IMDraw
