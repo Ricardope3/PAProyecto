@@ -37,9 +37,13 @@
 # METHODS
 * initializePast()
 * printBuilding()
+  * Prints the building matrix
 * printPast()
+  * Prints the past, which is an array containing the possible routes of a person to an exit
 * printPathMatrix()
+  * Prints the matrix that represents the path of a person in the matrix
 * getNumOfPeople()
+  * Function that counts the number of people in the building matrix
 * generateExits(floor [][]int)
   * Function that receives building matrix, and randomly generates a random number of exits on its borders
   * Parameters
@@ -55,6 +59,12 @@
   * Returns
     * bool: returns true if the exit was inserted, returns false if it was not
 * distance(a coordinate, b coordinate) float64
+  * Finds the distance between two coordinates
+  * Parameters
+    * a (coordinate): First coordinate
+    * b (coordinate): Second coordinate
+  * Returns
+    * float64: The distance between a and b
 * findClosestExit(position coordinate) int
 * validate(row int, col int) bool
 * searchPath(row int, col int) bool
@@ -63,10 +73,20 @@
 * drawPeople(win \*pixelgl.Window) \*imdraw.IMDraw
 * printLabels(win \*pixelgl.Window)
 * run()
+  * Generates the simulations, initializes the people, calls to generate the exits and the exit paths for the people and starts the go routines. It has a select that manages all the go routines, and when all the go routines end, this function stops the program.
 * movePerson(p person)
   * Moves a person to its next position on its path atribute
   * Paratemters
     * p (person): The person that is going to be moved
 * generateRandomSpeed() float32
+  * Generates a random speed for a person
+  * Returns
+    * float32: The speed generated
 * initiatePerson(p person, onMove chan person, onExit chan person, trapped []person)
+  * Function used to interact with each person's go routine, it manages if it moves or if it exits
+  * Parameters
+    * p (person): The current person
+    * onMove (chan person): The channel that moves the person
+    * onExit (chan person): The channel that exits the person
+    * trapped ([]person): An array containing all the people in the building at the start of the simulation
 * main()
