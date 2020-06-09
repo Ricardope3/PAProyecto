@@ -53,7 +53,7 @@
     * indexExit (int): the index where the exit is going to be inserted
     * lenF (int): The length of the side of the matrix
   * Returns
-   * bool: returns true if the exit was inserted, returns false if it was not
+    * bool: returns true if the exit was inserted, returns false if it was not
 * distance(a coordinate, b coordinate) float64
 * findClosestExit(position coordinate) int
 * validate(row int, col int) bool
